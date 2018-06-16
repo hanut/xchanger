@@ -1,0 +1,9 @@
+{
+  "name": "xchanger",
+  "version": "0.0.1",
+  "description": "Currency exhange api with auto caching of api calls for better performance and bandwidth utilization",
+  "main": "index.js",
+  "repository": "git@github.com:hanut/xchanger.git",
+  "author": "Hanut Singh Gusain <hanutsingh@gmail.com>",
+  "license": "MIT"
+}
