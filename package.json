@@ -1,6 +1,6 @@
 {
   "name": "xchanger",
-  "version": "0.0.1",
+  "version": "0.0.1a",
   "description": "Currency exhange api with auto caching of api calls for better performance and bandwidth utilization",
   "main": "index.js",
   "repository": "git@github.com:hanut/xchanger.git",
