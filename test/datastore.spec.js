@@ -15,6 +15,10 @@ describe('Datastore Module', function() {
     expect(datastore.init).to.be.a('function')
   })
 
+  it('should contain an init function', function() {
+    expect(datastore.init).to.be.a('function')
+  })
+
   describe('#init()', function() {
     it('should return a promise', function(done) {
       let promise = datastore.init(VALID_PATH).then(() => {

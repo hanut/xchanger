@@ -13,12 +13,18 @@ function openDB(path) {
   })
 }
 
-module.exports = {
+_selfRef = module.exports = {
 
   init: openDB,
 
   db: function() {
     return DB
+  },
+
+  get: function(){
+    return new Promise((resolve, reject) => {
+
+    })
   }
 
 
