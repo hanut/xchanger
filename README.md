@@ -99,6 +99,18 @@ Currently the api provides support for the 33 currencies listed below -
 
 Thats it!
 
+# DISCLAIMER
+This module uses exchangeratesapi.io to fetch rates and caches them for 30 minutes.
+There is no functionality to reduce that time as of now. Therefore, the converted results
+from this module may vary from the real time results.
+Furthermore, the fact that it depends on the external API means the author has no
+control over the rates returned and is therefore not liable for any damage, loss or
+failure due to the use of this module.
+
+# POST DISCLAIMER
+All that being said, if you are looking to convert currencies with reasonable accuracy
+and real time isnt really your use case, then go to town with this.
+
 # Author
 Created and maintained by Hanut Singh Gusain
 ### My Links
