@@ -16,6 +16,7 @@ const XCHANGE = function(base) {
   this.rates = undefined
   this.base = base
   this.updatedAt = new Date()
+  this.firstSyncDone = false
 }
 
 XCHANGE.prototype.sync = async function(base) {
@@ -28,7 +29,8 @@ XCHANGE.prototype.sync = async function(base) {
     base = this.base
   }
   return new Promise((resolve, reject) => {
-    needle('get', API_URL + "?base="+this.base, {compressed: true}).then(response => {
+    console.log('base:', this.base)
+    needle('get', API_URL + "?base="+base, {compressed: true}).then(response => {
       try{
         let rates = response.body.rates
         this.updatedAt = new Date()
@@ -98,7 +100,13 @@ XCHANGE.prototype.isValidCC = function(code) {
 
 
 XCHANGE.prototype.getCF = function(to, from){
-  return 1
+  if(to === from) {
+    return 1
+  }
+  if(from === this.base) {
+    return this.rates[to]
+  }
+  return this.rates[from]/this.rates[to]
 }
 
 XCHANGE.prototype.convert = async function(amount, to, from) {
@@ -115,18 +123,26 @@ XCHANGE.prototype.convert = async function(amount, to, from) {
       from = this.base
     }
     if(!this.isValidCC(from)) {
-      throw new Error('invalid/missing argument 3: to is not a valid country code')
+      throw new Error('invalid/missing argument 3: from is not a valid country code')
     }
     to = to.toString().toUpperCase()
     from = from.toString().toUpperCase()
-    let ratesExpired = ((new Date()).getMinutes() - this.updatedAt.getMinutes() > 5 ) ? true : false
-    if(ratesExpired) {
+    let timeDiff = new Date() - this.updatedAt
+    console.log('timeDiff:', timeDiff)
+    let ratesExpired = ( timeDiff > 5000 ) ? true : false
+    console.log(ratesExpired)
+    if(!this.firstSyncDone || ratesExpired) {
       this.rates = await this.sync()
       await this.saveRates(this.rates)
+      this.firstSyncDone = true
+      console.log('new rates: ',this.rates)
     } else if(!this.rates){
       this.rates = await this.loadRates()
+      console.log('old rates: ',this.rates)
     }
-    return amount * this.getCF(to, from)
+    let cf = this.getCF(to, from)
+    console.log("Conversion Factor = %d",cf)
+    return amount * cf
   } catch(error) {
     throw new Error(error)
   }
