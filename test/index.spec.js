@@ -1,5 +1,7 @@
 const expect = require('chai').expect
-const XCHANGE = require('../index.js')
+const XCHANGER = require('../index.js')
+let xchange = new XCHANGER('inr')
+
 const testRates = {
   AUD: 1.3576009707,
   BGN: 1.6950944704,
@@ -36,94 +38,115 @@ const testRates = {
   EUR: 0.8667013347
 }
 
-describe('Rate Caching Tests', function() {
-
-  it('should exist', function() {
-    expect(datastore).to.not.be.an('undefined')
+describe('Xchager module', function() {
+  it('index.js should exist', function() {
+    expect(XCHANGER).to.not.be.an('undefined')
   })
 
-  it('should contain an getRates function', function() {
-    expect(datastore.getRates).to.be.a('function')
-  })
-
-  it('should contain an updateRates function', function() {
-    expect(datastore.udpateRates).to.be.a('function')
-  })
-
-  describe('#getRates()', function() {
-    it('should return a promise', function(done) {
-      let promise = datastore.getRates().then(() => {
-        // do nothing
-      }).catch(error => {
-        // do nothing
-      })
-      expect(promise).to.be.a('promise')
+  it('should be a constructor', function(done) {
+    expect(XCHANGER).is.a('function')
+    try {
+      let tmp = new XCHANGER('inr')
+      expect(tmp).is.not.an('undefined')
       done()
-    })
-
-    it('should resolve with a list of rates', function(done) {
-      datastore.getRates().then(rates => {
-        done()
-      }).catch(error => {
-        done(error)
-      })
-    })
-  })
-
-  describe('#updateRates()', function() {
-    it('should return a promise', function(done) {
-      let promise = datastore.udpateRates().then(() => {
-         // do nothing
-      }).catch(error => {
-        // do nothing
-      })
-      expect(promise).to.be.a('promise')
-      done()
-    })
-
-    it('should update rate list on success', function(done) {
-      let ratesData = {
-        base: 'USD'
-      }
-      datastore.udpateRates(ratesData).then(rates => {
-        done()
-      }).catch(error => {
-        done(error)
-      })
-    })
-  })
-
-})
-
-describe('Rate Sync Tests', function() {
-
-  it('should exist', function() {
-    expect(service).to.not.be.an('undefined')
-  })
-
-  it('should contain a sync() function', function() {
-    expect(service.sync).to.be.a('function')
+    } catch(error) {
+      done(error)
+    }
   })
 
   describe('#sync()', function() {
-    it('should return a promise', function() {
-      let promise = service.sync().catch(error => console.log(error))
-      expect(promise).is.a('promise')
+    it('should be a function that returns a promise', function() {
+      expect(xchange.sync).to.be.a('function')
+      let promise = xchange.sync()
+      promise.catch(error => {throw Error(error)})
+      expect(promise).to.be.a('promise')
     })
 
-    it('should resolve with a desired response object', function(done) {
-      service.sync().then(response => {
-        expect(response.date).is.a('string')
-        expect(response.rates).is.an('object')
-        for(code in response.rates) {
-          expect(code).is.a('string')
-          expect(code.length).is.eq(3)
-          expect(response.rates[code]).is.a('number')
-        }
+    it('should response with a valid response', function(done) {
+      this.timeout(5000)
+      xchange.sync().then(response => {
+        expect(response).is.an('object')
         done()
-      }).catch(error => done(error))
+      }).catch(error => {
+        done(error)
+      })
+    })
+  })
+
+  describe('#saveRates()', function() {
+    it('should be a function', function() {
+      expect(xchange.saveRates).to.be.a('function')
     })
 
+    it('should save the provided rates correctly', function(done) {
+      xchange.saveRates(testRates).then(() => {
+        xchange.loadRates().then(ratesFromFile => {
+          expect(ratesFromFile.length).is.eq(testRates.length)
+          expect(ratesFromFile).to.eql(testRates)
+          done()
+        }).catch(done)
+      }).catch(done)
+    })
+  })
+
+  describe('#loadRates()', function() {
+    it('should be a function', function() {
+      expect(xchange.loadRates).to.be.a('function')
+    })
+
+    it('should load the rates', function(done) {
+      xchange.loadRates().then(() => {
+        done()
+      }).catch(error => {
+        console.log(error)
+        done(new Error(error))
+      })
+    })
+  })
+
+  describe('#setBase()', function() {
+    it('should be a function', function(){
+      expect(xchange.setBase).to.be.a('function')
+    })
+  })
+
+  describe('#getBase()', function() {
+    it('should be a function', function(){
+      expect(xchange.getBase).to.be.a('function')
+    })
+  })
+
+  describe('#getValidCodes()', function() {
+    it('should be a function', function(){
+      expect(xchange.getValidCodes).to.be.a('function')
+    })
+  })
+
+  describe('#isValidCC()', function() {
+    it('should be a function', function(){
+      expect(xchange.isValidCC).to.be.a('function')
+    })
+  })
+
+  describe('#getCF()', function() {
+    it('should be a function', function(){
+      expect(xchange.getCF).to.be.a('function')
+    })
+
+    it('should return a numeric value', function(){
+      expect(xchange.getCF(1)).to.be.a('number')
+    })
+  })
+
+  describe('#convert()', function() {
+    xchange = new XCHANGER('inr')
+
+    it('should be a function that returns a promise', function() {
+      expect(xchange.convert).to.be.a('function')
+      let promise = xchange.convert()
+      promise.catch(error => {return;})
+      expect(promise).to.be.a('promise')
+    })
   })
 
 

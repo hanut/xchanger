@@ -7,31 +7,32 @@ const API_URL = 'https://exchangeratesapi.io/api/latest'
 const VALID_BASE_CODES = ["AUD","BGN","BRL","CAD","CHF","CNY","CZK","DKK","EUR","GBP","HKD","HRK","HUF","IDR","ILS","INR","ISK","JPY","KRW","MXN","MYR","NOK","NZD","PHP","PLN","RON","RUB","SEK","SGD","THB","TRY","USD","ZAR"]
 
 
-
-const XCHANGE = function() {
-  this.rates = {}
-  _.each(VALID_BASE_CODES, code => {
-    rates[code] = ''
-  })
-  this.base = "USD"
+const XCHANGE = function(base) {
+  base = base.toUpperCase()
+  if(VALID_BASE_CODES.indexOf(base) === -1) {
+    console.log('invalid base code. initialising with USD')
+    base = 'USD'
+  }
+  this.rates = undefined
+  this.base = base
   this.updatedAt = new Date()
-  this.updatedAt.setMinutes(this.updatedAt.getMinutes())
 }
 
 XCHANGE.prototype.sync = async function(base) {
-  if(!base) {
-    invalidError()
-  }
-  base = base.toUpperCase()
-  if(VALID_BASE_CODES.indexOf(base) === -1) {
-    invalidError()
+  if(base) {
+    base = base.toUpperCase()
+    if(VALID_BASE_CODES.indexOf(base) === -1) {
+      invalidError()
+    }
+  } else {
+    base = this.base
   }
   return new Promise((resolve, reject) => {
-    needle('get', API_URL + "?base="+BASE, {compressed: true}).then(response => {
+    needle('get', API_URL + "?base="+this.base, {compressed: true}).then(response => {
       try{
-        let syncDate = (new Date()).toISOString()
         let rates = response.body.rates
-        resolve({date: syncDate, rates: rates})
+        this.updatedAt = new Date()
+        resolve(rates)
       } catch(error) {
         reject(error)
       }
@@ -41,33 +42,94 @@ XCHANGE.prototype.sync = async function(base) {
   })
 }
 
-XCHANGE.prototype.saveRates = async function() {
+XCHANGE.prototype.saveRates = function(rates) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(STORAGE_PATH, JSON.stringify(rates), (error) => {
+      if(error) {
+        return reject(error)
+      }
+      resolve()
+    })
+  })
+}
+
+XCHANGE.prototype.loadRates = function() {
+  return new Promise((resolve, reject) => {
+    fs.readFile(STORAGE_PATH, (err, rawData) => {
+      if(err) {
+        return reject(err)
+      }
+      try {
+        let ratesData = JSON.parse(rawData)
+        resolve(ratesData)
+      } catch(error) {
+        reject(error)
+      }
+    })
+  })
+}
+
+XCHANGE.prototype.setBase = function(base) {
+  base = base.toUpperCase()
+  if(VALID_BASE_CODES.indexOf(base) === -1) {
+    throw new Error('invalid base code')
+  }
+  this.base = base
+}
+
+XCHANGE.prototype.getBase = function(base) {
+  return this.base
+}
+
+XCHANGE.prototype.getValidCodes = function() {
+  return VALID_BASE_CODES
+}
+
+XCHANGE.prototype.isValidCC = function(code) {
+  if(!code) {
+    return false
+  }
+  if(code.length !== 3) {
+    return false
+  }
+  code = code.toString().toUpperCase()
+  return VALID_BASE_CODES.indexOf(code)
+}
+
+
+XCHANGE.prototype.getCF = function(to, from){
+  return 1
+}
+
+XCHANGE.prototype.convert = async function(amount, to, from) {
   try {
-    await fs.writeFile(STORAGE_PATH, JSON.stringify(XCHANGE_RATES))
-    return
-  } catch (error) {
+    if(!amount) {
+      throw new Error('missing argument 1: amount')
+    } else if(isNaN(amount)) {
+      throw new Error('invalid argument 1: expected amount to be a number')
+    }
+    if(!this.isValidCC(to)) {
+      throw new Error('invalid/missing argument 2: to is either not a valid country code or is not provided')
+    }
+    if(!from) {
+      from = this.base
+    }
+    if(!this.isValidCC(from)) {
+      throw new Error('invalid/missing argument 3: to is not a valid country code')
+    }
+    to = to.toString().toUpperCase()
+    from = from.toString().toUpperCase()
+    let ratesExpired = ((new Date()).getMinutes() - this.updatedAt.getMinutes() > 5 ) ? true : false
+    if(ratesExpired) {
+      this.rates = await this.sync()
+      await this.saveRates(this.rates)
+    } else if(!this.rates){
+      this.rates = await this.loadRates()
+    }
+    return amount * this.getCF(to, from)
+  } catch(error) {
     throw new Error(error)
   }
 }
 
-XCHANGE.prototype loadRates = async function() {
-  try {
-    let rawData = await fs.readFile(STORAGE_PATH, ratesData)
-    let ratesData = JSON.parse(rawData)
-    return ratesData
-  } catch (error) {
-    throw new Error(error)
-  }
-}
-
-loadRates().then(rates => {
-  XCHANGE_RATES = rates
-}).catch(error => {
-  console.log(error)
-})
-
-module.exports = {
-
-  load
-
-}
+module.exports = XCHANGE
