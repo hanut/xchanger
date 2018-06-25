@@ -1,5 +1,6 @@
 const expect = require('chai').expect
 const XCHANGER = require('../index.js')
+const _ = require('lodash')
 let xchange = new XCHANGER('inr')
 
 const testRates = {
@@ -115,8 +116,11 @@ describe('Xchager module', function() {
       expect(xchange.getBase).to.be.a('function')
     })
 
-    it('should be return a valid base code', function(done){
-      let validCodes
+    it('should be return a valid base code', function(){
+      let validCodes = xchange.getValidCodes()
+      let result = xchange.getBase()
+      let actualBase = xchange.base
+      expect(result).to.be.eql(actualBase)
     })
   })
 
@@ -127,8 +131,11 @@ describe('Xchager module', function() {
 
     it('should return a list of valid codes', function(){
       let rates = xchange.getValidCodes()
-      expect(rates).to.be.an('object')
-      expect(Object.keys(rates)).to.be,eql(Object.keys(testRates))
+      let testKeys = Object.keys(testRates)
+      testKeys = _.sortBy(testKeys)
+      let sortedRates = _.sortBy(rates)
+      expect(rates).to.be.an('array')
+      expect(rates).to.be.eql(testKeys)
     })
   })
 
