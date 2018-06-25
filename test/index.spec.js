@@ -114,11 +114,21 @@ describe('Xchager module', function() {
     it('should be a function', function(){
       expect(xchange.getBase).to.be.a('function')
     })
+
+    it('should be return a valid base code', function(done){
+      let validCodes
+    })
   })
 
   describe('#getValidCodes()', function() {
     it('should be a function', function(){
       expect(xchange.getValidCodes).to.be.a('function')
+    })
+
+    it('should return a list of valid codes', function(){
+      let rates = xchange.getValidCodes()
+      expect(rates).to.be.an('object')
+      expect(Object.keys(rates)).to.be,eql(Object.keys(testRates))
     })
   })
 
@@ -126,15 +136,28 @@ describe('Xchager module', function() {
     it('should be a function', function(){
       expect(xchange.isValidCC).to.be.a('function')
     })
+
+    it('should return a boolean value', function(){
+      expect(xchange.isValidCC('usd')).to.be.a('boolean')
+    })
   })
 
   describe('#getCF()', function() {
+    let xchange = new XCHANGER('inr')
+
+    before(function(done) {
+      xchange.sync().then((rates) => {
+        xchange.rates = rates
+        done()
+      }).catch(done)
+    })
+
     it('should be a function', function(){
       expect(xchange.getCF).to.be.a('function')
     })
 
     it('should return a numeric value', function(){
-      expect(xchange.getCF(1)).to.be.a('number')
+      expect(xchange.getCF(100, 'usd')).to.be.a('number')
     })
 
     it('should return a conversion factor that converts 1 of to -> from', function() {
@@ -238,7 +261,7 @@ describe('Xchager module', function() {
     context('Valid parameters', function() {
       it('should resolve successfully', function(done) {
         xchange.convert(100, 'USD').then(result => {
-          console.log(result)
+          expect(result).to.be.a('number')
           done()
         }).catch(done)
       })

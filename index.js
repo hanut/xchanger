@@ -29,7 +29,6 @@ XCHANGE.prototype.sync = async function(base) {
     base = this.base
   }
   return new Promise((resolve, reject) => {
-    console.log('base:', this.base)
     needle('get', API_URL + "?base="+base, {compressed: true}).then(response => {
       try{
         let rates = response.body.rates
@@ -128,20 +127,15 @@ XCHANGE.prototype.convert = async function(amount, to, from) {
     to = to.toString().toUpperCase()
     from = from.toString().toUpperCase()
     let timeDiff = new Date() - this.updatedAt
-    console.log('timeDiff:', timeDiff)
     let ratesExpired = ( timeDiff > 5000 ) ? true : false
-    console.log(ratesExpired)
     if(!this.firstSyncDone || ratesExpired) {
       this.rates = await this.sync()
       await this.saveRates(this.rates)
       this.firstSyncDone = true
-      console.log('new rates: ',this.rates)
     } else if(!this.rates){
       this.rates = await this.loadRates()
-      console.log('old rates: ',this.rates)
     }
     let cf = this.getCF(to, from)
-    console.log("Conversion Factor = %d",cf)
     return amount * cf
   } catch(error) {
     throw new Error(error)
