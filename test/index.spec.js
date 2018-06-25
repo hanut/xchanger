@@ -211,7 +211,7 @@ describe('Xchager module', function() {
             done('resolved despite missing amount')
           }).catch(error => {
             try {
-              expect(error.message).is.equal("Error: missing argument 1: amount")
+              expect(error.message).is.equal("Error: missing argument 1: `amount`")
               done()
             } catch(error) {
               done(error)
@@ -224,7 +224,7 @@ describe('Xchager module', function() {
             done('resolved despite missing amount')
           }).catch(error => {
             try {
-              expect(error.message).is.equal("Error: invalid argument 1: expected amount to be a number")
+              expect(error.message).is.equal("Error: invalid argument 1: expected `amount` to be a number")
               done()
             } catch(error) {
               done(error)
@@ -234,13 +234,13 @@ describe('Xchager module', function() {
 
       })
 
-      describe('to parameter is invalid/missing', function() {
-        it('should reject on missing "to"', function(done){
+      describe('`from` parameter is invalid/missing', function() {
+        it('should reject on missing `from`', function(done){
           xchange.convert(100).then(() => {
-            done('resolved despite missing to parameter')
+            done('resolved despite missing `from` parameter')
           }).catch(error => {
             try {
-              expect(error.message).is.equal("Error: invalid/missing argument 2: to is either not a valid country code or is not provided")
+              expect(error.message).is.equal("Error: invalid/missing argument 2: `from` is either not a valid country code or is not provided")
               done()
             } catch(error) {
               done(error)
@@ -248,12 +248,12 @@ describe('Xchager module', function() {
           })
         })
 
-        it('should reject on invalid "to"', function(done){
+        it('should reject on invalid `from`', function(done){
           xchange.convert(100, 'todooloodooloo').then(() => {
-            done('resolved despite invalid to parameter')
+            done('resolved despite invalid `from` parameter')
           }).catch(error => {
             try {
-              expect(error.message).is.equal("Error: invalid/missing argument 2: to is either not a valid country code or is not provided")
+              expect(error.message).is.equal("Error: invalid/missing argument 2: `from` is either not a valid country code or is not provided")
               done()
             } catch(error) {
               done(error)
@@ -262,19 +262,19 @@ describe('Xchager module', function() {
         })
       })
 
-      describe('from parameter is invalid/missing', function() {
-        it('should resolve on missing "from" by using from as default base', function(done){
+      describe('`to` parameter is invalid/missing', function() {
+        it('should resolve on missing `to` by using base currency', function(done){
           xchange.convert(100, 'USD').then(() => {
             done()
           }).catch(done)
         })
 
-        it('should reject on invalid "from"', function(done){
+        it('should reject on invalid `to`', function(done){
           xchange.convert(100, "USD", 'todooloodooloo').then(() => {
-            done('resolved despite invalid from parameter')
+            done('resolved despite invalid `to` parameter')
           }).catch(error => {
             try {
-              expect(error.message).is.equal("Error: invalid/missing argument 3: from is not a valid country code")
+              expect(error.message).is.equal("Error: invalid/missing argument 3: `to` is not a valid country code")
               done()
             } catch(error) {
               done(error)
@@ -289,6 +289,7 @@ describe('Xchager module', function() {
       it('should resolve successfully', function(done) {
         xchange.convert(100, 'USD').then(result => {
           expect(result).to.be.a('number')
+          console.log(result)
           done()
         }).catch(done)
       })

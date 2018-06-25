@@ -108,21 +108,21 @@ XCHANGE.prototype.getCF = function(to, from){
   return this.rates[from]/this.rates[to]
 }
 
-XCHANGE.prototype.convert = async function(amount, to, from) {
+XCHANGE.prototype.convert = async function(amount, from, to) {
   try {
     if(!amount) {
-      throw new Error('missing argument 1: amount')
+      throw new Error('missing argument 1: `amount`')
     } else if(isNaN(amount)) {
-      throw new Error('invalid argument 1: expected amount to be a number')
-    }
-    if(!this.isValidCC(to)) {
-      throw new Error('invalid/missing argument 2: to is either not a valid country code or is not provided')
-    }
-    if(!from) {
-      from = this.base
+      throw new Error('invalid argument 1: expected `amount` to be a number')
     }
     if(!this.isValidCC(from)) {
-      throw new Error('invalid/missing argument 3: from is not a valid country code')
+      throw new Error('invalid/missing argument 2: `from` is either not a valid country code or is not provided')
+    }
+    if(!to) {
+      to = this.base
+    }
+    if(!this.isValidCC(to)) {
+      throw new Error('invalid/missing argument 3: `to` is not a valid country code')
     }
     to = to.toString().toUpperCase()
     from = from.toString().toUpperCase()
@@ -135,7 +135,7 @@ XCHANGE.prototype.convert = async function(amount, to, from) {
     } else if(!this.rates){
       this.rates = await this.loadRates()
     }
-    let cf = this.getCF(to, from)
+    let cf = this.getCF(from, to)
     return amount * cf
   } catch(error) {
     throw new Error(error)

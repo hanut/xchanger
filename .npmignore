@@ -1,1 +1,5 @@
+.nyc_output/
+coverage/
+test/
 xchange.store
+codes.json
