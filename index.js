@@ -94,7 +94,7 @@ XCHANGE.prototype.isValidCC = function(code) {
     return false
   }
   code = code.toString().toUpperCase()
-  return VALID_BASE_CODES.indexOf(code)
+  return VALID_BASE_CODES.indexOf(code) === -1 ? false : true
 }
 
 

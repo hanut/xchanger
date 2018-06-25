@@ -109,6 +109,26 @@ describe('Xchager module', function() {
     it('should be a function', function(){
       expect(xchange.setBase).to.be.a('function')
     })
+
+    context('provided base is invalid', function() {
+      it('should throw an error ', function(){
+        expect(() => xchange.setBase('abcd')).to.throw('invalid base code')
+      })
+    })
+
+    context('provided base is valid', function() {
+      let xchange = new XCHANGER('USD')
+      before(function(done) {
+        xchange.sync().then((rates) => {
+          xchange.rates = rates
+          done()
+        }).catch(done)
+      })
+      it('should set the modules base currency ', function(){
+        xchange.setBase('inr')
+        expect(xchange.base).is.eql('INR')
+      })
+    })
   })
 
   describe('#getBase()', function() {
