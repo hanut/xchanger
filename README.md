@@ -14,7 +14,22 @@
 Currency converter with auto caching of exchange rates from exchangeratesapi.io
 
 # Usage
-//TODO
+Its really simple to use. Just require the module and create a new xchange
+instance.
+
+~~~~
+  const xchange = (require('xchanger'))()
+
+  xchange.setBase('inr') //Set the base exchange currency to use as a default
+
+  xchange.convert(100, 'usd').then(result => {
+    console.log(result)
+  }).catch(error => {
+    console.log(error)
+  })
+~~~~
+
+Thats it!
 
 #Author
-@author Hanut Singh Gusain <hanutsingh@gmail.com> [http://www.hanutsingh.in]
+Created and maintained by Hanut Singh Gusain <hanutsingh@gmail.com> [http://www.hanutsingh.in]
