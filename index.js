@@ -127,7 +127,7 @@ XCHANGE.prototype.convert = async function(amount, from, to) {
     to = to.toString().toUpperCase()
     from = from.toString().toUpperCase()
     let timeDiff = new Date() - this.updatedAt
-    let ratesExpired = ( timeDiff > 5000 ) ? true : false
+    let ratesExpired = ( timeDiff > 1000 * 60 * 30 ) ? true : false
     if(!this.firstSyncDone || ratesExpired) {
       this.rates = await this.sync()
       await this.saveRates(this.rates)
