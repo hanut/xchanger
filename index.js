@@ -3,7 +3,7 @@ const path = require('path')
 const needle = require('needle')
 const _ = require('lodash')
 const STORAGE_PATH = path.join(__dirname, 'xchange.store')
-const API_URL = 'https://exchangeratesapi.io/api/latest'
+const API_URL = 'https://api.exchangeratesapi.io/latest'
 const VALID_BASE_CODES = ["AUD","BGN","BRL","CAD","CHF","CNY","CZK","DKK","EUR","GBP","HKD","HRK","HUF","IDR","ILS","INR","ISK","JPY","KRW","MXN","MYR","NOK","NZD","PHP","PLN","RON","RUB","SEK","SGD","THB","TRY","USD","ZAR"]
 
 
