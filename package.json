@@ -23,5 +23,15 @@
     "istanbul": "^0.4.5",
     "nyc": "^12.0.2"
   },
-  "keywords": ["currency","convert","exchange","xchanger","xchange","currency converter","easy","currency", "conversion"]
+  "keywords": [
+    "currency",
+    "convert",
+    "exchange",
+    "xchanger",
+    "xchange",
+    "currency converter",
+    "easy",
+    "currency",
+    "conversion"
+  ]
 }
