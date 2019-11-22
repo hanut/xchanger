@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.10",
+    "mem": "^6.0.0",
     "needle": "^2.2.1"
   },
   "scripts": {
